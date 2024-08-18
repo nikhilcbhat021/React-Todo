@@ -1,6 +1,6 @@
 // imports
 const { safeParse } = require("zod");
-
+const {todos} = require("./db")
 const { createTodo, updateTodo } =  require("./types.js");
 
 
@@ -15,11 +15,20 @@ const middlewares = (req, res, next)=>{
     next();
 }
 
-app.get('/todos', (req, res) => {
-    res.send("Hello From Todo")
+app.get('/todos', async (req, res) => {
+    try {
+        const allTodos = await todos.find({});
+        res.status(200).json({
+            msg: allTodos
+        })
+    } catch (error) {
+        res.status(401).send("Something went wrong");
+        return;
+    }
+
 })
 
-app.post('/todo', middlewares, (req, res) => {
+app.post('/todo', middlewares, async (req, res) => {
 
     /**
      * TODO: Validate Auth.
@@ -35,15 +44,26 @@ app.post('/todo', middlewares, (req, res) => {
         return;
     }
 
-    res.status(200).send({
-        msg: "TODO Added successfully!"
-    })
-    return;
+    try {
+
+        await todos.add({title: parsedPayload.title , 
+            description: parsedPayload.description,
+            completed: false
+        });
+    
+        res.status(200).send({
+            msg: "TODO Added successfully!"
+        })
+    } catch(err) {
+        res.status(401).send("Something went wrong");
+        return;
+    }
+
 })
 
-app.put('/completed', (req, res) => {
+app.put('/completed', async (req, res) => {
 
-    const parsedPayload = createTodo.safeParse(req.body);
+    const parsedPayload = updateTodo.safeParse(req.body);
     if (!parsedPayload.success) {
         res.status(411).json({
             msg : "You sent the wrong inputs"
@@ -51,10 +71,22 @@ app.put('/completed', (req, res) => {
         return;
     }
 
-    res.status(200).send({
-        msg: "TODO Added successfully!"
-    })
-    return;
+    try {
+        
+        const updatedTodo = await todos.update({
+            _id: req.body.id
+        }, {
+            completed: true,
+        });
+
+        res.status(200).json({
+            msg: updatedTodo
+        })
+    } catch (error) {
+        res.status(401).send("Something went wrong");
+        return;
+    }
+
 })
 
 app.listen(port, ()=>{
