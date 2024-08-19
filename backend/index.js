@@ -1,6 +1,6 @@
 // imports
 const { safeParse } = require("zod");
-const {todos} = require("./db")
+const { todo } = require("./db.js")
 const { createTodo, updateTodo } =  require("./types.js");
 
 
@@ -10,25 +10,27 @@ const port = 3000;
 
 // middlewares
 app.use(express.json())
-const middlewares = (req, res, next)=>{
-    console.log('Inside middlewares');
-    next();
-}
+console.log("before all the handlers");
+// const middlewares = (req, res, next)=>{
+//     console.log('Inside middlewares');
+//     next();
+// }
 
 app.get('/todos', async (req, res) => {
     try {
-        const allTodos = await todos.find({});
+        const allTodos = await todo.find({});
         res.status(200).json({
             msg: allTodos
         })
     } catch (error) {
-        res.status(401).send("Something went wrong");
+        console.log(error);
+        res.status(401).send("Something went wrong"+error);
         return;
     }
 
 })
 
-app.post('/todo', middlewares, async (req, res) => {
+app.post('/todo', async (req, res) => {
 
     /**
      * TODO: Validate Auth.
@@ -46,16 +48,17 @@ app.post('/todo', middlewares, async (req, res) => {
 
     try {
 
-        await todos.add({title: parsedPayload.title , 
-            description: parsedPayload.description,
-            completed: false
+        await todo.create({"title": req.body.title , 
+            "description": req.body.description,
+            "completed": false
         });
     
         res.status(200).send({
             msg: "TODO Added successfully!"
         })
     } catch(err) {
-        res.status(401).send("Something went wrong");
+
+        res.status(401).send("Something went wrong\n"+err);
         return;
     }
 
@@ -73,17 +76,18 @@ app.put('/completed', async (req, res) => {
 
     try {
         
-        const updatedTodo = await todos.update({
+        const updatedTodo = await todo.update({
             _id: req.body.id
         }, {
-            completed: true,
+            completed: true
         });
 
         res.status(200).json({
             msg: updatedTodo
         })
     } catch (error) {
-        res.status(401).send("Something went wrong");
+
+        res.status(402).send("Something went wrong" + error);
         return;
     }
 

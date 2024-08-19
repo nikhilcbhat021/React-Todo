@@ -9,7 +9,7 @@
 
 const mongoose  = require("mongoose");
 
-mongoose.connect("mongodb+srv://nikhilbhat021:BEF7AmHdhnnYlpJF@cluster0.wdn5th3.mongodb.net/");
+mongoose.connect("mongodb+srv://nikhilbhat021:BEF7AmHdhnnYlpJF@cluster0.wdn5th3.mongodb.net/todos");
 
 const todoSchema = mongoose.Schema({
     title: String,
@@ -17,10 +17,11 @@ const todoSchema = mongoose.Schema({
     completed: Boolean
 })
 
-const todos = mongoose.model('Todos' , todoSchema);
+const todo = mongoose.model('Todos' , todoSchema);
 
-module.export = {
-    todos
+console.log("About to export DB object");
+module.exports = {
+    todo
 }
 
 // todoTable.add({title: "Default Todo" , description: "This is a default todo.. You can't do anything about it."})
