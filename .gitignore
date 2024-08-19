@@ -1,3 +1,5 @@
 # ignore all node_modules.
-
 node_modules/
+
+#ignore the git push script
+git_push.sh
