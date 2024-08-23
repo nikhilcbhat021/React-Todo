@@ -1,6 +1,7 @@
 // imports
 const { safeParse } = require("zod");
 const { todo } = require("./db.js")
+const cors = require("cors")
 const { createTodo, updateTodo } =  require("./types.js");
 
 
@@ -10,6 +11,8 @@ const port = 3000;
 
 // middlewares
 app.use(express.json())
+app.use(cors());
+
 console.log("before all the handlers");
 // const middlewares = (req, res, next)=>{
 //     console.log('Inside middlewares');
@@ -20,7 +23,7 @@ app.get('/todos', async (req, res) => {
     try {
         const allTodos = await todo.find({});
         res.status(200).json({
-            msg: allTodos
+            data: allTodos
         })
     } catch (error) {
         console.log(error);
@@ -48,13 +51,16 @@ app.post('/todo', async (req, res) => {
 
     try {
 
-        await todo.create({"title": req.body.title , 
+        const ret = await todo.create({"title": req.body.title , 
             "description": req.body.description,
             "completed": false
         });
     
+        console.log (ret);
+
         res.status(200).send({
-            msg: "TODO Added successfully!"
+            msg: "TODO Added successfully!",
+            data: ret 
         })
     } catch(err) {
 
@@ -76,14 +82,16 @@ app.put('/completed', async (req, res) => {
 
     try {
         
-        const updatedTodo = await todo.update({
+        const updatedTodo = await todo.findOneAndUpdate({
             _id: req.body.id
         }, {
             completed: true
+        }, {
+            new: true
         });
 
         res.status(200).json({
-            msg: updatedTodo
+            data: updatedTodo
         })
     } catch (error) {
 

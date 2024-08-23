@@ -1,9 +1,17 @@
 import { useEffect, useState } from 'react';
+import axios from 'axios'
+import { backendendpoint } from '../App.jsx'
 
-export default function TodoInputComponent({handleAddTodo}) {
+export default function TodoInputComponent({handleAddTodo, todoCount=0}) {
     
     const [todoTitle, setTodoTitle] = useState('')
     const [todoDescription, setTodoDescription] = useState('');
+
+    useEffect(()=> {
+        console.log('UseEffect -- TodoInpComp');
+    }, [])
+
+    const token = '12345678987654321.241.erazf123rq34';
 
     return (
         <div>
@@ -20,17 +28,31 @@ export default function TodoInputComponent({handleAddTodo}) {
             <button
                 placeholder="Title"
                 style={{padding:'10px', margin: '10px', fontSize: '1rem'}}
-                onClick={() => {
-                        const todoObj = {title:todoTitle, description:todoDescription, completed: false};
+                onClick={async() => {
+                        let todoObj = {title:todoTitle, description:todoDescription, completed: false};
                         if (todoObj.title!=='' && todoDescription.description!=='') {
                             setTodoDescription('');
                             setTodoTitle('');
+                            const postResponse = await axios.post(`${backendendpoint}/todo`, todoObj, {
+                                Headers: {
+                                    Authorization: `${token}`,
+                                },
+                            })
+
+                            console.log("After posting the todo...");
+                            console.log(postResponse);
+
+                            todoObj._id = postResponse.data.data._id;
                             return handleAddTodo(todoObj);
                         }
                     }
                 }
             > Add Todo 
             </button>
+
+            <div>
+                <p style={{padding:'10px', fontSize: '1.5rem'}}>You have {todoCount} Todos pending...</p>
+            </div>
         </div>
     )
 };
