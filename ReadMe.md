@@ -16,3 +16,6 @@
 #### Features TO-DO :-
 - User Signin, Signup.
 - Add a Deadline.
+- After clicking on 'Mark as completed' , move the todo to another Array --- Todo Completed.
+  	- These 2 can be arranged as a carousal maybe..? Or the Completed array can be
+  	  added as a dropdown...
